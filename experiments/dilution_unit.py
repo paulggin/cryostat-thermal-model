@@ -1,39 +1,5 @@
 """
 Cooling-power model for a 3He/4He dilution refrigerator.
-
-The mixing-chamber cooling power, for a continuous-circulation DR running at
-3He molar flow rate n_dot (mol/s), is
-
-    Q_dot_MXC(T_MXC, T_in) = n_dot * (H_out(T_MXC) - H_in(T_in))            [W]
-
-where H is the enthalpy of the 3He stream above the absolute zero reference.
-At low T (Pobell Eq. 7.30), the enthalpies reduce to
-
-    H_dilute(T)   ~ 95.0 * T**2  J/mol      (3He in dilute phase)
-    H_concentrated(T) ~ 11.0 * T**2 J/mol   (3He in concentrated phase, post-HX)
-
-so the standard textbook result is
-
-    Q_dot_MXC ~ n_dot * (95 - 11) * T_MXC**2 - n_dot * 11 * (T_in**2 - T_MXC**2)
-              ~ 84 * n_dot * (T_MXC**2 - T_in**2)                            [W]
-
-with T_in the 3He temperature at the inlet of the mixing chamber (i.e., after
-the final heat exchanger between the still return and the incoming concentrated
-stream). Below the T_in << T_MXC limit, Q_MXC ~ 84 * n_dot * T_MXC**2.
-
-The still cooling power is set by the 4He evaporative cooling at ~0.7-0.9 K:
-the still pump extracts mostly 3He vapor, but the residual 4He carries the
-latent heat of vaporization L_4 ~ 23.6 J/mol. For a 3He-dominated still flow,
-the still cooling power is approximately
-
-    Q_dot_still ~ n_dot * L_3       L_3 ~ 25 J/mol latent enthalpy at ~0.7 K
-
-In a practical LD400, n_dot_3 is ~500 umol/s, giving Q_still ~ 12-30 mW
-matching the catalog value.
-
-The cold-plate stage is set by the heat-exchanger thermal anchor between the
-still return and the dilute-stream return; the published LD400 specs treat it
-as ~700 uW at 100 mK and we use that as a tabulated value.
 """
 
 from __future__ import annotations
@@ -53,29 +19,7 @@ L3_VAP = 25.0
 
 @dataclass
 class DilutionUnit:
-    """
-    Closed-form Pobell dilution-unit cooling-power model.
-
-    Parameters
-    ----------
-    n_dot_3 : float
-        3He molar circulation rate (mol/s). LD400 default: ~500e-6.
-    T_in_K : float
-        3He temperature at the mixing-chamber inlet (K), set by the last
-        heat exchanger before the MXC. LD400-class HX achieves T_in ~ 1.5 * T_MXC.
-        For a steady-state model we treat T_in as proportional to T_MXC and
-        absorb the proportionality into the effective enthalpy coefficient.
-    Q_cp_100mK : float
-        Reference cold-plate cooling power at 100 mK (W). LD400 published: 700 uW.
-    Q_still_nominal : float
-        Reference still cooling power at the operating point (W).
-        LD400 published: ~30 mW.
-    """
-
-    n_dot_3: float = 500e-6
-    T_in_factor: float = 1.5  # T_in_K = T_in_factor * T_MXC at HX equilibrium
-    Q_cp_100mK_W: float = 700e-6
-    Q_still_nominal_W: float = 30e-3
+   published: ~30 mW.
 
     def Q_MXC(self, T_MXC_K):
         """Mixing-chamber cooling power at temperature T_MXC_K (W)."""
@@ -95,11 +39,6 @@ class DilutionUnit:
         return float(np.sqrt(max(Q_load_W, 0.0) / coef))
 
     def Q_still(self, T_still_K):
-        """
-        Still cooling power. Pobell models this as n_dot * L_3 at the operating
-        still temperature; LD400 quotes ~30 mW at the operating point. Use a
-        gentle linear interpolation around the catalog value as T_still varies.
-        """
         return self.Q_still_nominal_W * (T_still_K / 0.8)
 
     def Q_cold_plate(self, T_cp_K):
