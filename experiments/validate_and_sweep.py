@@ -1,18 +1,13 @@
 """
 Validation + N_coax sweep against BlueFors LD400 published specifications.
 
-BlueFors LD400 catalog (as advertised on the product brochure):
+BlueFors LD400 catalog:
   Stage 1 (50K plate):  ~40 W cooling capacity at 45 K
   Stage 2 (4K plate):   ~1.5 W cooling capacity at 4.2 K
   Still (~0.8 K):       ~30 mW cooling capacity
   Cold plate (~0.1 K):  ~700 uW cooling capacity
   MXC (~10 mK):         ~14 uW cooling capacity, base temperature < 10 mK
 
-The check: with no wiring stack and only catalog parasitic loads, the solver
-should land each stage near these reference operating points (the parasitic
-loads should be roughly the same magnitude as the catalog cooling capacities,
-so the stages settle near the operating points). Then sweep the qubit-control
-coax count N to find the limit before T_MXC > 50 mK.
 """
 
 from __future__ import annotations
@@ -95,7 +90,7 @@ def main():
             T_lo, T_hi = Ts_MXC[i-1], Ts_MXC[i]
             N_50mK = N_lo + (0.050 - T_lo) * (N_hi - N_lo) / (T_hi - T_lo)
             print(f"Engineering limit (interp): N_coax = {N_50mK:.0f} brings T_MXC to 50 mK")
-    np.savetxt("/sessions/lucid-elegant-davinci/mnt/Cowork Brainstem/Quantum Job Search/Portfolio/Cryostat_Thermal_Model/outputs/data/sweep_T_MXC_vs_N_coax.csv",
+    np.savetxt(r"C:\Users\Paul\OneDrive\Desktop\Portfolio Projects\Cryostat - Thermal Model\outputs\data\sweep_T_MXC_vs_N_coax.csv",
                np.array(rows),
                header="N_coax,N_dc,T_50K_K,T_4K_K,T_still_K,T_CP_K,T_MXC_K",
                delimiter=",", comments="")
