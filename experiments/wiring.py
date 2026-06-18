@@ -1,31 +1,3 @@
-"""
-Heat-load model for a qubit-control wiring stack in a dilution refrigerator.
-
-A control line is a series of coax segments between consecutive temperature
-stages, each of which contributes:
-
-  (a) conducted heat into the colder stage from the hotter stage above, via
-      Q_dot_cond = (A_center + A_outer) / L * conduction_integral(material, T_hot, T_cold)
-      summed over the two metal conductors (center + outer);
-
-  (b) microwave signal dissipation at the attenuator anchored to that stage,
-      which converts fraction (1 - 10^(-A_dB/10)) of the incident microwave
-      power to heat at that stage's temperature.
-
-Heat loads per DC bias line are computed the same way, with no attenuator
-chain. The signal-Joule contribution is typically negligible for DC lines.
-
-The default geometry below is a UT-085-class semi-rigid coax with
-stainless-steel outer and beryllium-copper center on the warm (300K -> 4K)
-section, transitioning to a NbTi-NbTi superconducting cable below 4K. This
-matches the BlueFors LD-series default cabling and the Krinner et al. (2019)
-EPJ QT reference setup for a ~100-qubit fridge.
-
-Attenuator chain follows the standard IBM Quantum / Krinner et al. scheme:
-0 / -20 / -10 / -6 / -3 dB at 50K / 4K / Still / CP / MXC, designed to
-suppress 300 K thermal noise to below ~10 mK equivalent at the qubit.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -131,10 +103,6 @@ _LENGTHS = {
 
 
 def standard_coax_line(drive_power_dBm: float = 0.0) -> CoaxLine:
-    """
-    Default BlueFors-style qubit drive coax with IBM-style attenuator chain.
-    SS304 outer + BeCu center on warm sections; NbTi-NbTi below 4 K.
-    """
     pairs = [
         ("room", "50K_plate", "BeCu", "SS304"),
         ("50K_plate", "4K_plate", "BeCu", "SS304"),
@@ -167,10 +135,6 @@ def standard_coax_line(drive_power_dBm: float = 0.0) -> CoaxLine:
 
 
 def standard_dc_bias_line() -> DCBiasLine:
-    """
-    Twisted-pair phosphor-bronze (modeled here as brass) DC bias line.
-    36 AWG, 0.0127 mm^2 conductor cross-section, two conductors per line.
-    """
     A_pair = 2 * 0.0127e-6  # m^2 (two wires)
     segments = []
     for (hot, cold), L in _LENGTHS.items():
