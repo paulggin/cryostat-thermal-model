@@ -20,7 +20,7 @@ from wiring import standard_coax_line, standard_dc_bias_line
 from dilution_unit import DilutionUnit
 from solver import solve_steady_state
 
-PLOTS = "/sessions/lucid-elegant-davinci/mnt/Cowork Brainstem/Quantum Job Search/Portfolio/Cryostat_Thermal_Model/outputs/plots"
+PLOTS = r"C:\Users\Paul\OneDrive\Desktop\Portfolio Projects\Cryostat - Thermal Model\outputs\plots"
 os.makedirs(PLOTS, exist_ok=True)
 
 PARASITIC = {
