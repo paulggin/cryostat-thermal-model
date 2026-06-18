@@ -1,20 +1,5 @@
 """
 Thermal conductivity integrals for common cryogenic materials.
-
-Implements the conduction-integral function
-
-    K(T_hot, T_cold) = integral_{T_cold}^{T_hot} kappa(T) dT  [W/m]
-
-for the materials listed in data/kappa_tables.csv. The conducted heat through a
-wire of cross-section A [m^2] and length L [m] between two stages at T_hot and
-T_cold is then
-
-    Q_dot = (A / L) * K(T_hot, T_cold)   [W].
-
-Between tabulated grid points, kappa(T) is treated as a power law in T
-(kappa = a * T^n with n fixed by the two endpoints), which is the textbook
-parameterization for cryogenic conductivity data. The integral over each
-power-law segment has a closed form and is summed across the tabulated grid.
 """
 
 from __future__ import annotations
