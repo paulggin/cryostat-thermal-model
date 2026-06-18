@@ -1,17 +1,3 @@
-"""
-Steady-state five-stage heat-balance solver for a BlueFors LD400-class
-dilution refrigerator with a qubit-control wiring stack.
-
-At each stage, the operating temperature is set by Q_dot_load(T) = Q_dot_cool(T),
-where the load is the sum of (a) heat conducted in from the wiring stack
-above plus (b) microwave / DC signal dissipation at the stage, and the
-cooling power is the relevant pulse-tube or dilution-unit expression.
-
-Solved top-down because each stage's temperature sets the upstream boundary
-for the next-colder stage's conduction integrals. scipy.optimize.brentq is
-used for each single-variable root find.
-"""
-
 from __future__ import annotations
 
 import numpy as np
@@ -129,11 +115,6 @@ def solve_steady_state(n_coax=16, n_dc=8, drive_dBm=0.0,
     loads["4K_plate"] = _wiring_load_at_stage("4K_plate", T, n_coax, n_dc, drive_dBm) + parasitic["4K_plate"]
     cooling["4K_plate"] = pt.Q_stage2(T["4K_plate"])
 
-    # --- Still: in real BlueFors operation T_still is heater-controlled to ~0.85 K
-    # independent of base load; the still pump rate is set by the heater. Clamp
-    # T_still to the operating point and report the implied heater power as
-    # cooling["still"] - load (positive means the heater is supplying the excess
-    # cooling power that the dilution unit alone provides at that T).
     if still_mode == "heater_clamped":
         T["still"] = STILL_OPERATING_T_K
     elif still_mode == "passive_balance":
