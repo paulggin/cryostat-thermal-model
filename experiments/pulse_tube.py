@@ -1,15 +1,9 @@
 """
 Cryomech PT415-class two-stage pulse-tube cryocooler cooling-power model.
 
-The PT415 is the standard cryocooler used by BlueFors LD-series dry DRs.
-Its published cooling power curves are linear-ish piecewise functions of
-stage temperature in the operating range:
-
   Stage 1 (~50 K anchor):  0 W @ 30 K, 40 W @ 45 K, 60 W @ 80 K  (approx)
   Stage 2 (~4 K anchor):   0 W @ 2.5 K, 1.5 W @ 4.2 K, 3 W @ 10 K  (approx)
 
-We use piecewise-linear interpolation in (T, Q) space between the tabulated
-catalog values. Negative cooling power is clipped to zero.
 """
 
 from __future__ import annotations
